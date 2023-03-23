@@ -14,37 +14,44 @@ const moedas = [
   'tron',
 ]
 
-console.log("------------------------")
+async function webScraping() {
+  
+  const resultado = []
 
-moedas.forEach((moeda) => {
-
-  const options = {
-    uri: url_base + moeda,
-    transform: (body) => {
-      return cheerio.load(body)
+  for (const moeda of moedas) {
+    const options = {
+      uri: url_base + moeda,
+      transform: (body) => {
+        return cheerio.load(body)
+      }
     }
+
+    await rp(options)
+      .then(($) => {
+        const priceIntegral = $("h2.css-1rdnxvt").text().split(" ")
+        const symbol = priceIntegral[1]
+        const name = $("h1.css-1xvru47").text()
+        const price = new Intl.NumberFormat('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(priceIntegral[3].replace("USD", "").replace(",", ""));
+
+        return resultado.push({
+          coin: {
+            name,
+            symbol,
+          },
+          price,
+        })
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
-    
-  rp(options)
-    .then(($) => {
-      const text = $("h2.css-1rdnxvt").text().split(" ")
-      const moeda = text[1]
-      let valor = text[3].replace("USD", "").replace(",", "")
-      valor = new Intl.NumberFormat('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(valor);
-      
-      console.log(`MOEDA: ${moeda}`)
-      console.log(`VALOR: ${valor}`)
-      console.log("------------------------")
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-})
+  
+  return resultado
+}
 
-
-
-
-  /// html/body/div[1]/div/div[1]/div[2]/div/div[1]/div[2]/div/div[2]/div[1]/div/span
+webScraping()
+  .then(resultado => console.log(resultado))
+  .catch(error => console.log(error))
