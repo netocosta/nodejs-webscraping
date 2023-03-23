@@ -1,23 +1,26 @@
 const rp = require('request-promise')
 const cheerio = require('cheerio')
 
+const url_base = 'https://crypto.com/price/pt-BR/'
+
 const moedas = [
-  'https://crypto.com/price/pt-BR/apecoin-ape',
-  'https://crypto.com/price/pt-BR/axie-infinity',
-  'https://crypto.com/price/pt-BR/polkadot-new',
-  'https://crypto.com/price/pt-BR/tron',
-  'https://crypto.com/price/pt-BR/jumptoken',
-  'https://crypto.com/price/pt-BR/bitcoin',
-  'https://crypto.com/price/pt-BR/ethereum',
-  'https://crypto.com/price/pt-BR/bnb',
+  'apecoin-ape',
+  'axie-infinity',
+  'bitcoin',
+  'bnb',
+  'ethereum',
+  'jumptoken',
+  'polkadot-new',
+  'tron',
 ]
 
 console.log("------------------------")
 
-moedas.forEach((url) => {
+moedas.forEach((moeda) => {
+
   const options = {
-    uri: url,
-    transform: function (body) {
+    uri: url_base + moeda,
+    transform: (body) => {
       return cheerio.load(body)
     }
   }
